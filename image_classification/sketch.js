@@ -1,38 +1,60 @@
 let mobilenet;
-//let puffin;
 let video;
-let label='';
+let label = "";
+let classifier;
+let ukeButton;
+let whistleButton;
+let trainButton;
 
 function modelReady() {
   console.log("Model is ready!");
-  mobilenet.predict(gotResults);
+}
+
+function videoReady() {
+  console.log("Video is ready!");
+}
+
+function whileTraining(loss) {
+  if(loss == null){
+    console.log("Training Completed");
+    classifier.classify(gotResults);
+  }else{
+    console.log(loss);
+  }
 }
 
 function gotResults(error, results) {
   if (error) {
     console.error(error);
   } else {
-    //console.log(results);
-    label = results[0].className;
-    mobilenet.predict(gotResults);
+    label = results;
+    classifier.classify(gotResults);
   }
 }
 
-// function imageReady() {
-//   image(puffin, 0, 0, width, height);
-// }
-
 function setup() {
-  //createCanvas(windowWidth, windowHeight);
   createCanvas(640, 550);
-  //puffin = createImg("images/puffin.jpg", imageReady);
-  //puffin.hide();
   video = createCapture(VIDEO);
   video.hide();
   background(0);
 
-  //mobilenet = ml5.imageClassifier("MobileNet", modelReady);
-  mobilenet = ml5.imageClassifier("MobileNet", video, modelReady);
+  mobilenet = ml5.featureExtractor("MobileNet", modelReady);
+  classifier = mobilenet.classification(video, videoReady);
+
+  ukeButton = createButton("ukulele");
+  ukeButton.mousePressed(function() {
+    classifier.addImage("ukulele");
+  });
+
+  whistleButton = createButton("whistle");
+  whistleButton.mousePressed(function() {
+    classifier.addImage("whistle");
+  });
+
+  trainButton = createButton("train");
+  trainButton.mousePressed(function() {
+    classifier.train(whileTraining);
+  });
 }
 
 function draw() {

@@ -1,9 +1,9 @@
 let mobilenet;
 let video;
 let label = "";
-let classifier;
-let ukeButton;
-let whistleButton;
+let predictor;
+let slider;
+let addButton;
 let trainButton;
 
 function modelReady() {
@@ -17,7 +17,7 @@ function videoReady() {
 function whileTraining(loss) {
   if(loss == null){
     console.log("Training Completed");
-    classifier.classify(gotResults);
+    predictor.predict(gotResults);
   }else{
     console.log(loss);
   }
@@ -28,7 +28,7 @@ function gotResults(error, results) {
     console.error(error);
   } else {
     label = results;
-    classifier.classify(gotResults);
+    predictor.predict(gotResults);
   }
 }
 
@@ -39,21 +39,19 @@ function setup() {
   background(0);
 
   mobilenet = ml5.featureExtractor("MobileNet", modelReady);
-  classifier = mobilenet.classification(video, videoReady);
+  predictor = mobilenet.regression(video, videoReady);
 
-  ukeButton = createButton("ukulele");
-  ukeButton.mousePressed(function() {
-    classifier.addImage("ukulele");
-  });
+  slider = createSlider(0,1,0.5,0.01);
 
-  whistleButton = createButton("whistle");
-  whistleButton.mousePressed(function() {
-    classifier.addImage("whistle");
+
+  addButton = createButton("add example image");
+  addButton.mousePressed(function() {
+    predictor.addImage(slider.value()); // bir resim al buna slider in o anki degerini ata
   });
 
   trainButton = createButton("train");
   trainButton.mousePressed(function() {
-    classifier.train(whileTraining);
+    predictor.train(whileTraining);
   });
 }
 

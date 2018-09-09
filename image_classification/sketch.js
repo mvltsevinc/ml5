@@ -1,4 +1,46 @@
-let mobilenet;
+let classifier;
+
+function modelLoaded() {
+  console.log("Model Loaded!");
+}
+
+function gotResults(err,results) {
+  if(err != null){
+    console.log("Hata olustu");
+  }else{
+    document.getElementById("result").innerHTML = results[0].className;
+    console.log(results);
+  }
+}
+
+function previewFile() {
+  var preview = document.getElementById("imgUploaded");
+  var file    = document.querySelector('input[type=file]').files[0];
+  var reader  = new FileReader();
+
+  reader.onloadend = function () {
+    preview.src = reader.result;
+  }
+
+  if (file) {
+    reader.readAsDataURL(file);
+  } else {
+    preview.src = "";
+  }
+}
+
+function predictImage(){
+  classifier.predict(document.getElementById("imgUploaded"), gotResults);
+}
+
+function setup() {
+  classifier = ml5.imageClassifier("MobileNet", modelLoaded);
+  
+}
+
+function draw() {}
+
+/*let mobilenet;
 let video;
 let label = "";
 let predictor;
@@ -61,4 +103,4 @@ function draw() {
   fill(255);
   textSize(32);
   text(label, 10, height - 20);
-}
+}*/
